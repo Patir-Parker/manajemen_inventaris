@@ -1,1 +1,1 @@
-Tugas PKL : Tugas Pengenalan(Individu)
+Tugas PKL : Tugas Pengenalan (Individu)
