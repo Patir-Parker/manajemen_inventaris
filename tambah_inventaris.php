@@ -125,6 +125,7 @@ if (isset($_POST['submit'])) {
                 min="<?php echo date('Y-m-d'); ?>" required>
             </div>
             <button type="submit" name="submit" class="btn btn-dark">Tambah Pergerakan</button>
+            <a href="daftar_inventaris.php" class="btn btn-dark">Kembali</a>
         </form>
     </div>
 
