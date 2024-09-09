@@ -54,7 +54,7 @@ if (isset($_GET['delete_id'])) {
             }
         }
     } catch (mysqli_sql_exception $e) {
-        $_SESSION['message'] = "Kesalahan: " . $e->getMessage();
+        $_SESSION['message'] = "Kesalahan: Data sedang digunakan. Tidak dapat menghapus barang ini.";
     }
 
     header("Location: barang.php");
@@ -148,7 +148,7 @@ if (isset($_GET['delete_id'])) {
         
         <?php if ($message): ?>
             <div class="notif-container mt-4">
-                <div class='alert alert-danger alert-dismissible fade show' role='alert'>
+                <div class='alert alert-secondary alert-dismissible fade show' role='alert'>
                     <?php echo $message; ?>
                     <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
                         <span aria-hidden='true'>&times;</span>
