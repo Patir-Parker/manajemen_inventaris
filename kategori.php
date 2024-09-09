@@ -14,7 +14,7 @@ $search = '';
 
 // Cek apakah ada input pencarian
 if (isset($_GET['search'])) {
-    $search = $_GET['search'];
+    $search = mysqli_real_escape_string($conn, $_GET['search']);
 }
 
 // Ubah query untuk pencarian
@@ -28,11 +28,41 @@ while ($row = mysqli_fetch_assoc($result)) {
     $items[] = $row;
 }
 
+// Pindahkan logika penghapusan ke sini
+if (isset($_GET['delete_id'])) {
+    $delete_id = intval($_GET['delete_id']);
+
+    // Hapus data berdasarkan ID
+    $deleteQuery = "DELETE FROM kategori WHERE id = ?";
+    $stmt = mysqli_prepare($conn, $deleteQuery);
+    mysqli_stmt_bind_param($stmt, "i", $delete_id);
+
+    try {
+        if (mysqli_stmt_execute($stmt)) {
+            $_SESSION['message'] = "Kategori berhasil dihapus!";
+        } else {
+            // Cek apakah error karena foreign key constraint
+            if (mysqli_errno($conn) == 1451) {
+                $_SESSION['message'] = "Data sedang digunakan. Tidak dapat menghapus kategori ini.";
+            } else {
+                $_SESSION['message'] = "Gagal menghapus kategori.";
+            }
+        }
+    } catch (mysqli_sql_exception $e) {
+        $_SESSION['message'] = "Kesalahan: Data sedang digunakan. Tidak dapat menghapus kategori ini.";
+    }
+
+    mysqli_stmt_close($stmt);
+    header("Location: kategori.php");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manajemen Kategori</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -101,11 +131,13 @@ while ($row = mysqli_fetch_assoc($result)) {
         
         <!-- Notifikasi Pesan -->
         <?php if ($message): ?>
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <?php echo $message; ?>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+            <div class="notif-container mt-4">
+                <div class='alert alert-secondary alert-dismissible fade show' role='alert'>
+                    <?php echo $message; ?>
+                    <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
+                        <span aria-hidden='true'>&times;</span>
+                    </button>
+                </div>
             </div>
         <?php endif; ?>
 
@@ -120,11 +152,11 @@ while ($row = mysqli_fetch_assoc($result)) {
             <tbody>
                 <?php foreach ($items as $index => $row): ?>
                     <tr>
-                        <td><?php echo $index + 1; // Menampilkan ID yang disesuaikan ?></td>
+                        <td><?php echo $index + 1; ?></td>
                         <td><?php echo htmlspecialchars($row['nama_kategori']); ?></td>
                         <td>
                             <a href="edit_kategori.php?id=<?php echo $row['id']; ?>" class="btn btn-dark btn-sm">Edit</a>
-                            <a href="hapus_kategori.php?id=<?php echo $row['id']; ?>" class="btn btn-dark btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus kategori ini?')">Hapus</a>
+                            <a href="kategori.php?delete_id=<?php echo $row['id']; ?>" class="btn btn-dark btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus kategori ini?')">Hapus</a>
                         </td>
                     </tr>
                 <?php endforeach; ?>
