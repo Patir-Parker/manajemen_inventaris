@@ -6,14 +6,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $nama_pemasok = $_POST['nama_pemasok'];
     $info_kontak = $_POST['info_kontak'];
 
-    $query = "INSERT INTO pemasok (nama_pemasok, info_kontak) VALUES ('$nama_pemasok', '$info_kontak')";
-    if (mysqli_query($conn, $query)) {
-        $_SESSION['message'] = "Pemasok berhasil ditambahkan!";
-        header('Location: pemasok.php');
-        exit();
+    // Cek apakah email sudah ada
+    $checkEmailQuery = "SELECT * FROM pemasok WHERE info_kontak = '$info_kontak'";
+    $result = mysqli_query($conn, $checkEmailQuery);
+
+    if (mysqli_num_rows($result) > 0) {
+        $_SESSION['message'] = "Email sudah terdaftar!";
+        $_SESSION['alert_type'] = "warning"; // Kuning untuk peringatan
     } else {
-        echo "Error: " . mysqli_error($conn);
+        // Jika email tidak ada, tambahkan ke database
+        $query = "INSERT INTO pemasok (nama_pemasok, info_kontak) VALUES ('$nama_pemasok', '$info_kontak')";
+        if (mysqli_query($conn, $query)) {
+            $_SESSION['message'] = "Pemasok berhasil ditambahkan!";
+            header('Location: pemasok.php');
+            exit();
+        } else {
+            echo "Error: " . mysqli_error($conn);
+        }
     }
+
+    header('Location: tambah_pemasok.php'); // Kembali ke halaman tambah jika ada masalah
+    exit();
 }
 ?>
 
@@ -75,6 +88,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </nav>
     <div class="container mt-4">
         <h1>Tambah Pemasok</h1>
+        
+        <!-- Notifikasi Pesan -->
+        <?php if (isset($_SESSION['message'])): ?>
+            <div class="alert alert-<?php echo $_SESSION['alert_type']; ?>">
+                <?php
+                    echo $_SESSION['message'];
+                    unset($_SESSION['message'], $_SESSION['alert_type']); // Hapus pesan setelah ditampilkan
+                ?>
+            </div>
+        <?php endif; ?>
+
         <form action="tambah_pemasok.php" method="post">
             <div class="form-group">
                 <label for="nama_pemasok">Nama Pemasok</label>
