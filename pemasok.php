@@ -27,6 +27,34 @@ $items = [];
 while ($row = mysqli_fetch_assoc($result)) {
     $items[] = $row;
 }
+
+if (isset($_GET['delete_id'])) {
+    $delete_id = intval($_GET['delete_id']);
+
+    // Hapus data berdasarkan ID
+    $deleteQuery = "DELETE FROM pemasok WHERE id = ?";
+    $stmt = mysqli_prepare($conn, $deleteQuery);
+    mysqli_stmt_bind_param($stmt, "i", $delete_id);
+
+    try {
+        if (mysqli_stmt_execute($stmt)) {
+            $_SESSION['message'] = "Pemasok berhasil dihapus!";
+        } else {
+            // Cek apakah error karena foreign key constraint
+            if (mysqli_errno($conn) == 1451) {
+                $_SESSION['message'] = "Data sedang digunakan. Tidak dapat menghapus kategori ini.";
+            } else {
+                $_SESSION['message'] = "Gagal menghapus kategori.";
+            }
+        }
+    } catch (mysqli_sql_exception $e) {
+        $_SESSION['message'] = "Kesalahan: Data sedang digunakan. Tidak dapat menghapus pemasok";
+    }
+
+    mysqli_stmt_close($stmt);
+    header("Location: pemasok.php");
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -99,11 +127,13 @@ while ($row = mysqli_fetch_assoc($result)) {
         </div>
         <a href="tambah_pemasok.php" class="btn btn-outline-dark mb-3">Tambah Pemasok</a>
         <?php if ($message): ?>
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <?php echo $message; ?>
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+            <div class="notif-container mt-4">
+                <div class='alert alert-secondary alert-dismissible fade show' role='alert'>
+                    <?php echo $message; ?>
+                    <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
+                        <span aria-hidden='true'>&times;</span>
+                    </button>
+                </div>
             </div>
         <?php endif; ?>
         <table class="table table-bordered table-hover table-striped">
