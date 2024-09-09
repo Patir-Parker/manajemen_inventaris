@@ -18,7 +18,8 @@ if (isset($_GET['search'])) {
 }
 
 // Ubah query untuk pencarian
-$query = "SELECT * FROM kategori WHERE nama_kategori LIKE '%$search%'";
+$query = "SELECT * FROM kategori WHERE nama_kategori LIKE '%$search%'
+        ORDER BY kategori.id DESC";
 $result = mysqli_query($conn, $query);
 
 // Menyimpan data untuk menampilkan ID yang disesuaikan

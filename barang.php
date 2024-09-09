@@ -24,7 +24,8 @@ $query = "SELECT barang.id, barang.nama_barang, kategori.nama_kategori, pemasok.
           JOIN pemasok ON barang.id_pemasok = pemasok.id
           WHERE barang.nama_barang LIKE '%$search%' 
           OR kategori.nama_kategori LIKE '%$search%' 
-          OR pemasok.nama_pemasok LIKE '%$search%'";
+          OR pemasok.nama_pemasok LIKE '%$search%'
+          ORDER BY barang.id DESC";
 
 $result = mysqli_query($conn, $query);
 
@@ -40,13 +41,25 @@ if (isset($_GET['delete_id'])) {
 
     // Hapus data berdasarkan ID
     $deleteQuery = "DELETE FROM barang WHERE id = $delete_id";
-    mysqli_query($conn, $deleteQuery);
 
-    $_SESSION['message'] = "Barang berhasil dihapus!";
+    try {
+        if (mysqli_query($conn, $deleteQuery)) {
+            $_SESSION['message'] = "Barang berhasil dihapus!";
+        } else {
+            // Cek apakah error karena foreign key constraint
+            if (mysqli_errno($conn) == 1451) {
+                $_SESSION['message'] = "Data sedang digunakan. Tidak dapat menghapus barang ini.";
+            } else {
+                $_SESSION['message'] = "Gagal menghapus barang.";
+            }
+        }
+    } catch (mysqli_sql_exception $e) {
+        $_SESSION['message'] = "Kesalahan: " . $e->getMessage();
+    }
+
     header("Location: barang.php");
     exit();
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -70,8 +83,8 @@ if (isset($_GET['delete_id'])) {
             margin-bottom: 30px;
         }
         .table-container {
-        max-height: 450px;
-        overflow-y: auto;
+            max-height: 450px;
+            overflow-y: auto;
         }
         .table-fixed {
             position: relative;
@@ -132,10 +145,10 @@ if (isset($_GET['delete_id'])) {
         </div>
         
         <a href="tambah_barang.php" class="btn btn-outline-dark mb-3">Tambah Barang</a>
-        <!-- Notifikasi Pesan -->
+        
         <?php if ($message): ?>
-            <div class="container mt-4">
-                <div class='alert alert-success alert-dismissible fade show' role='alert'>
+            <div class="notif-container mt-4">
+                <div class='alert alert-danger alert-dismissible fade show' role='alert'>
                     <?php echo $message; ?>
                     <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
                         <span aria-hidden='true'>&times;</span>
@@ -143,6 +156,7 @@ if (isset($_GET['delete_id'])) {
                 </div>
             </div>
         <?php endif; ?>
+        
         <div class="table-container">
         <table class="table table-bordered table-hover table-striped table-fixed">
             <thead class="thead-dark">

@@ -14,7 +14,8 @@ if (isset($_GET['search'])) {
 $query = "SELECT inventaris.id, barang.nama_barang, inventaris.jenis_pergerakan, inventaris.jumlah, inventaris.tanggal_pergerakan 
           FROM inventaris 
           JOIN barang ON inventaris.id_barang = barang.id
-          WHERE barang.nama_barang LIKE '%$search%' OR inventaris.jenis_pergerakan LIKE '%$search%'";
+          WHERE barang.nama_barang LIKE '%$search%' OR inventaris.jenis_pergerakan LIKE '%$search%'
+          ORDER BY inventaris.id DESC";
 $result = mysqli_query($conn, $query);
 
 // Menyimpan data untuk menampilkan ID yang disesuaikan
@@ -128,6 +129,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                         <td><?php echo htmlspecialchars($row['jumlah']); ?></td>
                         <td><?php echo htmlspecialchars($row['tanggal_pergerakan']); ?></td>
                         <td>
+                            <a href="edit_inventaris.php?id=<?php echo $row['id']; ?>" class="btn btn-dark btn-sm">Edit</a>
                             <a href="hapus_inventaris.php?id=<?php echo $row['id']; ?>" class="btn btn-dark btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus pergerakan ini?')">Hapus</a>
                         </td>
                     </tr>

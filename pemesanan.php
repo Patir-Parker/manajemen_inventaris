@@ -14,7 +14,8 @@ if (isset($_GET['search'])) {
 $query = "SELECT Pemesanan.id, Barang.nama_barang, Pemesanan.tanggal_pemesanan, Pemesanan.jumlah 
           FROM Pemesanan 
           JOIN Barang ON Pemesanan.id_barang = Barang.id
-          WHERE Barang.nama_barang LIKE '%$search%'";
+          WHERE Barang.nama_barang LIKE '%$search%'
+          ORDER BY pemesanan.id DESC";
 $result = mysqli_query($conn, $query);
 
 // Menyimpan data untuk menampilkan ID yang disesuaikan
@@ -124,6 +125,7 @@ while ($row = mysqli_fetch_assoc($result)) {
                         <td><?php echo htmlspecialchars($row['tanggal_pemesanan']); ?></td>
                         <td><?php echo htmlspecialchars($row['jumlah']); ?></td>
                         <td>
+                        <a href="edit_pemesanan.php?id=<?php echo $row['id']; ?>" class="btn btn-dark btn-sm">Edit</a>
                             <a href="hapus_pemesanan.php?id=<?php echo $row['id']; ?>" class="btn btn-dark btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus pemesanan ini?')">Hapus</a>
                         </td>
                     </tr>

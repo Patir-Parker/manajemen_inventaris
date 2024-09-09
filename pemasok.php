@@ -18,7 +18,8 @@ if (isset($_GET['search'])) {
 }
 
 // Fetch pemasok
-$query = "SELECT * FROM pemasok WHERE nama_pemasok LIKE '%$search%'";
+$query = "SELECT * FROM pemasok WHERE nama_pemasok LIKE '%$search%'
+        ORDER BY pemasok.id DESC";
 $result = mysqli_query($conn, $query);
 
 // Menyimpan data untuk menampilkan ID yang disesuaikan
