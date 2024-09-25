@@ -26,17 +26,17 @@
             font-size: 4rem;
             font-weight: bold;
             margin-bottom: 20px;
-            animation: fadeInDown 1s;
+            animation: fadeInDown 4s;
         }
         .hero-section p {
             font-size: 1.5rem;
             margin-bottom: 30px;
-            animation: fadeInUp 1.5s;
+            animation: fadeInUp 3.5s;
         }
         .hero-section a {
             padding: 15px 30px;
             font-size: 1.2rem;
-            animation: fadeInUp 2s;
+            animation: fadeInUp 4s;
         }
         .features-section {
             padding: 40px 0;
